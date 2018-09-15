@@ -1,7 +1,9 @@
 import React from 'react';
 import {Dimensions,Image,StyleSheet,Text,TouchableHighlight,View} from 'react-native';
-import Expo, { Asset, Audio, FileSystem, Font, Permissions, AppLoading } from 'expo';
+import Expo, { Asset, Audio, FileSystem, Font, Permissions } from 'expo';
 import { Button, Toolbar } from 'react-native-material-ui';
+import Biometric from './Biometric';
+import { TextField } from 'react-native-material-textfield';
 
 class Icon {
   constructor(module, width, height) {
@@ -47,6 +49,8 @@ export default class App extends React.Component {
       shouldCorrectPitch: true,
       volume: 1.0,
       rate: 1.0,
+      display: "contract",
+      contract: "This is a test contract. It is not meaningful, just filler text that fills up space."
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
   }
@@ -164,7 +168,7 @@ export default class App extends React.Component {
     console.log(`FILE INFO: ${JSON.stringify(info)}`);
 
     {/* Send URI to processRecording
-    await Audio.
+    let this.state.contract = await Audio.getContract()
     */}
 
     await Audio.setAudioModeAsync({
@@ -256,6 +260,7 @@ export default class App extends React.Component {
   }
 
   render() {
+    if (this.state.display == 'record')
     return !this.state.fontLoaded ? (
       <View style={styles.emptyContainer} />
     ) : !this.state.haveRecordingPermissions ? (
@@ -267,7 +272,7 @@ export default class App extends React.Component {
         <View />
       </View>
     ) : (
-      <View style={styles.container}>
+      <View style={styles.banner}>
         <Toolbar
         leftElement=""
         centerElement="ConvoTract"
@@ -330,6 +335,25 @@ export default class App extends React.Component {
         <Button raised primary text="Enter Pin"/>
       </View>
     );
+  else if (this.state.display == "contract")
+    return !this.state.fontLoaded ? 
+        <View style={styles.emptyContainer} /> : 
+      <View>
+        
+        <View style={styles.banner}>
+          <Toolbar
+          leftElement=""
+          centerElement="ConvoTract"
+        />
+        </View>
+        <View style = {styles.contract}>
+          <Text>
+            {this.state.contract}
+          </Text>
+        </View>
+        <Biometric />
+      </View>
+    
   }
 }
 
@@ -347,6 +371,14 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
     minHeight: DEVICE_HEIGHT,
     maxHeight: DEVICE_HEIGHT,
+  },
+  banner: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: BACKGROUND_COLOR,
   },
   noPermissionsText: {
     textAlign: 'center',
@@ -409,6 +441,28 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
     padding: 10,
   },
+  contract: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 70,
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    minHeight: DEVICE_HEIGHT / 2.0,
+    maxHeight: DEVICE_HEIGHT / 2.0
+  },
+  bottombutton: {
+    paddingTop: 270,
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    minHeight: DEVICE_HEIGHT / 2.0,
+    maxHeight: DEVICE_HEIGHT / 2.0
+  }
 });
 
 Expo.registerRootComponent(App);
