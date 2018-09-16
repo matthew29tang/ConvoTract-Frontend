@@ -3,7 +3,8 @@ import {Dimensions,Image,StyleSheet,Text,TouchableHighlight,View} from 'react-na
 import Expo, { Asset, Audio, FileSystem, Font, Permissions } from 'expo';
 import { Button, Toolbar } from 'react-native-material-ui';
 import Biometric from './Biometric';
-import { TextField } from 'react-native-material-textfield';
+import CodePin from 'react-native-pin-code';
+
 
 class Icon {
   constructor(module, width, height) {
@@ -25,7 +26,7 @@ const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
 const BACKGROUND_COLOR = '#FFF8ED';
 const LIVE_COLOR = '#FF0000';
 const DISABLED_OPACITY = 0.5;
-const RATE_SCALE = 3.0;
+
 
 export default class App extends React.Component {
   constructor(props) {
@@ -49,7 +50,7 @@ export default class App extends React.Component {
       shouldCorrectPitch: true,
       volume: 1.0,
       rate: 1.0,
-      display: "contract",
+      display: "record",
       contract: "This is a test contract. It is not meaningful, just filler text that fills up space."
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
@@ -231,6 +232,11 @@ export default class App extends React.Component {
     }
   };
 
+  _displayPin = () => {
+    this.setState({
+      display: 'pin',
+    });
+  }
   _onStopPressed = () => {
     if (this.sound != null) {
       this.sound.stopAsync();
@@ -332,7 +338,7 @@ export default class App extends React.Component {
           </View>
           <View />
         </View>
-        <Button raised primary text="Enter Pin"/>
+        <Button raised primary text="Enter Pin" onPress={() => this._displayPin()}/>
       </View>
     );
   else if (this.state.display == "contract")
@@ -353,8 +359,20 @@ export default class App extends React.Component {
         </View>
         <Biometric />
       </View>
-    
+  else if (this.state.display == "pin")
+    return !this.state.fontLoaded ? 
+        <View style={styles.emptyContainer} /> : 
+        <CodePin
+        code="2018" // code.length is used if you not pass number prop
+        success={() => console.log('hurray!')} // If user fill '2018', success is called
+        text="A simple Pin code component" // My title
+        error="You fail" // If user fail (fill '2017' for instance)
+        autoFocusFirst={false} // disabling auto-focus
+        keyboardType="numeric"
+        />
+  
   }
+  
 }
 
 const styles = StyleSheet.create({
