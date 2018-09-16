@@ -4,6 +4,7 @@ import Expo from "expo";
 import DropdownAlert from "react-native-dropdownalert";
 import { Button } from "react-native-material-ui";
 import { Styles } from "../util/BiometricStyles";
+import { API } from '../util/API';
 
 class Biometric extends React.Component {
     constructor(props) {
@@ -62,11 +63,13 @@ class Biometric extends React.Component {
     scanBiometrics = async () => {
         let result = await Expo.Fingerprint.authenticateAsync("Biometric Scan.");
         if (result.success) {
+            await API.consent(this.props.key, this.props.user);
             this.dropdown.alertWithType(
                 "success",
                 "Bio-Authentication succeeded",
                 "You have signed the paper."
             );
+
         } else {
             this.dropdown.alertWithType(
                 "error",

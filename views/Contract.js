@@ -19,7 +19,7 @@ class Contract extends React.Component {
                         { this.props.contract }
                     </Text>
                 </View>
-                <Biometric />
+                <Biometric pin={this.props.pin} key={this.props.key} user={this.props.user} />
             </View>
         )
     }

@@ -4,6 +4,7 @@ import { Styles } from "../util/Styles";
 import { Controls } from "../util/Controls";
 import { Toolbar, Button } from 'react-native-material-ui';
 import { Audio, FileSystem } from 'expo';
+import { API } from "../util/API";
 
 class Main extends React.Component {
     constructor(props) {
@@ -69,6 +70,7 @@ class Main extends React.Component {
             playsInSilentModeIOS: true,
             shouldDuckAndroid: true,
             interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+            playThroughEarpieceAndroid: false
         });
         if (this.state.recording) {
             this.state.recording.setOnRecordingStatusUpdate(null);
@@ -111,6 +113,7 @@ class Main extends React.Component {
             playsInSilentLockedModeIOS: true,
             shouldDuckAndroid: true,
             interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+            playThroughEarpieceAndroid: false
         });
         const { sound, status } = await this.state.recording.createNewLoadedSound({
             isLooping: true,
@@ -123,6 +126,9 @@ class Main extends React.Component {
             isLoading: false,
             sound: sound
         });
+        result = await API.processRecording(this.state.recording.getURI());
+        console.log(result)
+        this.props.finishRecording(result.key, result.contract);
     }
     
     async _getContract() {
