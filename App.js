@@ -57,9 +57,9 @@ class App extends React.Component {
         })
     }
 
-    _displayPin = () => {
+    _changeDisplay = (newView) => {
         this.setState({
-            currentView: Enums.Views.Pin
+            currentView: newView
         });
         console.log("Changed view");
     }
@@ -71,11 +71,11 @@ class App extends React.Component {
         } else {
             const currentView = this.state.currentView;
             if (currentView === Enums.Views.Main) {
-                return (<Views.Main haveRecordingPermissions={this.state.haveRecordingPermissions} finishRecording={this._finishRecording} viewChange={this._displayPin}></Views.Main>);
+                return (<Views.Main haveRecordingPermissions={this.state.haveRecordingPermissions} finishRecording={this._finishRecording} viewChange={this._changeDisplay}></Views.Main>);
             } else if (currentView === Enums.Views.Contract) {
-                return (<Views.Contract pin={this.state.pin} key={this.state.key} user={this.state.user ? 2 : 1} contract={this.state.contract}></Views.Contract>);
+                return (<Views.Contract pin={this.state.pin} key={this.state.key} user={this.state.user ? 2 : 1} contract={this.state.contract} viewChange={this._changeDisplay}></Views.Contract>);
             } else if (currentView === Enums.Views.Pin) {
-                return (<Views.Pin success={this._success}></Views.Pin>);
+                return (<Views.Pin success={this._success} viewChange={this._changeDisplay}></Views.Pin>);
             }
         }
     }

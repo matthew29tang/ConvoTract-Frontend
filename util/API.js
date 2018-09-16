@@ -13,13 +13,11 @@ const ajax = (url, data, callback = null, contentType = null) => {
 const API = {
     processRecording: (url, callback) => {
         const body = new FormData();
-        body.append("picture", {
+        body.append("file", {
             uri: url,
             name: "recording"
         });
-        return ajax("processRecording", {
-            file: body
-        }, null, "multipart/form-data");
+        return ajax("processRecording", body, null, "multipart/form-data");
         
     },
     generatePin: (key, callback) => {

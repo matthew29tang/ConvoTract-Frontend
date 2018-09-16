@@ -1,16 +1,17 @@
 import React from "react";
-import { Image, Text, TouchableHighlight, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Image, Text, TouchableHighlight, View } from "react-native";
 import { Styles } from "../util/Styles";
 import { Controls } from "../util/Controls";
 import { Toolbar, Button } from 'react-native-material-ui';
 import { Audio, FileSystem } from 'expo';
+import { Enums } from "../util/Enums";
 import { API } from "../util/API";
 
 class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            displayLoading: false
         }
     } 
     
@@ -55,6 +56,12 @@ class Main extends React.Component {
             }
         }
     };
+
+    _updateLoading = (newState) => {
+        this.setState({
+            displayLoading: newState
+        })
+    }
     
     async _stopPlaybackAndBeginRecording() {
         this.setState({
@@ -126,9 +133,11 @@ class Main extends React.Component {
             isLoading: false,
             sound: sound
         });
+        this._updateLoading(true);
         result = await API.processRecording(this.state.recording.getURI());
-        console.log(result)
-        this.props.finishRecording(result.key, result.contract);
+        console.log(result);
+        if (result.key != null)
+            this.props.finishRecording(result.key, result.contract);
     }
     
     async _getContract() {
@@ -169,7 +178,7 @@ class Main extends React.Component {
     
     _displayPin = () => {
         console.log(this.props);
-        this.props.viewChange();
+        this.props.viewChange(Enums.Views.Pin);
     }
 
     _onStopPressed = () => {
@@ -248,11 +257,26 @@ class Main extends React.Component {
 
                         <View />
                     </View>
+                    <View style={[styles.container, styles.horizontal]}>
+                        <ActivityIndicator animating = {this.state.displayLoading} size="large" color="#0000ff" />
+                    </View>
                     <Button raised primary text="Enter Pin" onPress={() => this._displayPin()}/>
                 </View>
             )
         }
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center'
+    },
+    horizontal: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      padding: 10
+    }
+  })
 
 export { Main }
