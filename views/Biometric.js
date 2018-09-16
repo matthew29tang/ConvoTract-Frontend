@@ -6,7 +6,8 @@ import { Button } from "react-native-material-ui";
 import { Styles } from "../util/BiometricStyles";
 
 class Biometric extends React.Component {
-    constructor() {
+    constructor(props) {
+        super(props)
         this.state = {
             compatible: true
         }

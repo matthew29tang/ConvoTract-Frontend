@@ -19,3 +19,5 @@ class Pin extends React.Component {
         )
     }
 }
+
+export { Pin }

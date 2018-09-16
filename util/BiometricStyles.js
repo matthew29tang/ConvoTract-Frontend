@@ -5,7 +5,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "space-around",
-        paddingTop: Constants.statusBarHeight,
+        paddingTop: 10,
         backgroundColor: "#FFFFFF",
     },
     Button: {

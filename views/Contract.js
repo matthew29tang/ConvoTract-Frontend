@@ -24,3 +24,5 @@ class Contract extends React.Component {
         )
     }
 }
+
+export { Contract }
