@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Platform, Alert } from "react-native";
+import { View, Platform, Alert, TextInput } from "react-native";
 import Expo from "expo";
 import DropdownAlert from "react-native-dropdownalert";
 import { Button } from "react-native-material-ui";
@@ -10,7 +10,8 @@ class Biometric extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            compatible: true
+            compatible: true,
+            fullName: ""
         }
     }
 
@@ -63,7 +64,7 @@ class Biometric extends React.Component {
     scanBiometrics = async () => {
         let result = await Expo.Fingerprint.authenticateAsync("Biometric Scan.");
         if (result.success) {
-            await API.consent(this.props.key, this.props.user);
+            await API.consent(this.props.key, this.props.user, this.state.fullName);
             this.dropdown.alertWithType(
                 "success",
                 "Bio-Authentication succeeded",
@@ -84,6 +85,7 @@ class Biometric extends React.Component {
             <View>
                 <View style={ Styles.Container }>
                     <View style = { Styles.BottomButton }>
+                        <TextInput onChangeInput={(text) => this.setState({ fullName: text })} value={this.state.fullName ? this.state.fullName : ""} />
                         <Button raised primary text="Sign paper" onPress={ this.state.compatible ? this.checkForBiometrics : this.showIncompatibleAlert } />
                     </View>
                     <DropdownAlert ref={ ref => (this.dropdown = ref) } closeInterval={ 5000 } />

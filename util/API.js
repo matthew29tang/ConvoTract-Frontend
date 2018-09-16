@@ -24,10 +24,11 @@ const API = {
             pin: pin
         });
     },
-    consent: (key, user, callback) => {
+    consent: (key, user, fullName, callback) => {
         ajax("consent", {
             key: key,
-            user: user
+            user: user,
+            fullName: fullName
         });
     }
 }
