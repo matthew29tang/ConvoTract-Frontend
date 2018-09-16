@@ -1,17 +1,37 @@
 const contracts = require("./contracts");
 const request = require("request");
 
+let contract = null;
+
 const processRecording = (req, res) => {
-    request.post("https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US")
+    const options = {
+        url: "https://api.rev.ai/revspeech/v1beta/jobs",
+        method: "POST",
+        headers: {
+            Authorization: "Bearer 01TCZQw9bq1GKIlxdFeCTqTo0KDKBMg3QMBlx1NyiokWMhUkYOlHyWznHcvY4gVMo_c_NmoK6tVm6i0fSePs8HTpV5IPw",
+            "Content-Type": "application/json"
+        },
+        form: {
+            data: {
+                media_url: "https://support.rev.com/hc/en-us/article_attachments/200043975/FTC_Sample_1_-_Single.mp3",
+                callback_url: "https://convotract.appspot.com:8080/transcribed"
+            } 
+        }
+    }
 
-    const contract = "hi";
-    const key = contracts.push({
-        contract: contract
-    }).key;
-
-    res.send({
-        contract: contract,
-        key: key
+    request(options, (err, res, body) => {
+        let t = setInterval(() => {
+            if(contract !== null) {
+                clearInterval(t);
+                const key = contracts.push({
+                    contract: contract
+                }).key;
+                res.send({
+                    contract: contract,
+                    key: key
+                })
+            }
+        }, 1000);
     });
 }
 
@@ -53,7 +73,8 @@ const enterPin = (req, res) => {
                 valid = true;
                 res.send({
                     valid: true,
-                    key: s.key
+                    key: s.key,
+                    contract: s.val().contract
                 });
             }
         });
@@ -90,9 +111,44 @@ const consent = (req, res) => {
     });
 }
 
+const transcribed = (req, res) => {
+    const options = {
+        url: "https://api.rev.ai/revspeech/v1beta/jobs/" + req.body.id + "/transcript",
+        method: "GET",
+        headers: {
+            Authorization: "Bearer 01TCZQw9bq1GKIlxdFeCTqTo0KDKBMg3QMBlx1NyiokWMhUkYOlHyWznHcvY4gVMo_c_NmoK6tVm6i0fSePs8HTpV5IPw",
+            "Content-Type": "text/plain",
+            Accept: "text/plain"
+        }
+    }
+
+    request(options, (err, res, body) => {
+        let text = "";
+        body.split("\n").forEach(line => {
+            text += line.replace(/(.+ \d\d:\d\d )/g, "") + " ";
+        });
+        const options2 = {
+            url: "http://40.76.8.113/fill_out",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            form: {
+                data: {
+                    text: text
+                }
+            }
+        }
+        request(options2, (err2, res2, body2) => {
+            contract = body2.text
+        });
+    });
+}
+
 module.exports = {
     processRecording,
     generatePin,
     enterPin,
-    consent
+    consent,
+    transcribed
 }
