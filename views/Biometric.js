@@ -7,6 +7,7 @@ import { Styles } from "../util/BiometricStyles";
 
 class Biometric extends React.Component {
     constructor() {
+        super();
         this.state = {
             compatible: true
         }
