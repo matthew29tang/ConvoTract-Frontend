@@ -1,7 +1,10 @@
 import React from 'react';
 import {Dimensions,Image,StyleSheet,Text,TouchableHighlight,View} from 'react-native';
-import Expo, { Asset, Audio, FileSystem, Font, Permissions, AppLoading } from 'expo';
+import Expo, { Asset, Audio, FileSystem, Font, Permissions } from 'expo';
 import { Button, Toolbar } from 'react-native-material-ui';
+import Biometric from './Biometric';
+import CodePin from 'react-native-pin-code';
+
 
 class Icon {
   constructor(module, width, height) {
@@ -23,7 +26,7 @@ const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get('window');
 const BACKGROUND_COLOR = '#FFF8ED';
 const LIVE_COLOR = '#FF0000';
 const DISABLED_OPACITY = 0.5;
-const RATE_SCALE = 3.0;
+
 
 export default class App extends React.Component {
   constructor(props) {
@@ -47,6 +50,8 @@ export default class App extends React.Component {
       shouldCorrectPitch: true,
       volume: 1.0,
       rate: 1.0,
+      display: "record",
+      contract: "This is a test contract. It is not meaningful, just filler text that fills up space."
     };
     this.recordingSettings = JSON.parse(JSON.stringify(Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY));
   }
@@ -164,7 +169,7 @@ export default class App extends React.Component {
     console.log(`FILE INFO: ${JSON.stringify(info)}`);
 
     {/* Send URI to processRecording
-    await Audio.
+    let this.state.contract = await Audio.getContract()
     */}
 
     await Audio.setAudioModeAsync({
@@ -227,6 +232,11 @@ export default class App extends React.Component {
     }
   };
 
+  _displayPin = () => {
+    this.setState({
+      display: 'pin',
+    });
+  }
   _onStopPressed = () => {
     if (this.sound != null) {
       this.sound.stopAsync();
@@ -256,6 +266,7 @@ export default class App extends React.Component {
   }
 
   render() {
+    if (this.state.display == 'record')
     return !this.state.fontLoaded ? (
       <View style={styles.emptyContainer} />
     ) : !this.state.haveRecordingPermissions ? (
@@ -267,7 +278,7 @@ export default class App extends React.Component {
         <View />
       </View>
     ) : (
-      <View style={styles.container}>
+      <View style={styles.banner}>
         <Toolbar
         leftElement=""
         centerElement="ConvoTract"
@@ -327,10 +338,41 @@ export default class App extends React.Component {
           </View>
           <View />
         </View>
-        <Button raised primary text="Enter Pin"/>
+        <Button raised primary text="Enter Pin" onPress={() => this._displayPin()}/>
       </View>
     );
+  else if (this.state.display == "contract")
+    return !this.state.fontLoaded ? 
+        <View style={styles.emptyContainer} /> : 
+      <View>
+        
+        <View style={styles.banner}>
+          <Toolbar
+          leftElement=""
+          centerElement="ConvoTract"
+        />
+        </View>
+        <View style = {styles.contract}>
+          <Text>
+            {this.state.contract}
+          </Text>
+        </View>
+        <Biometric />
+      </View>
+  else if (this.state.display == "pin")
+    return !this.state.fontLoaded ? 
+        <View style={styles.emptyContainer} /> : 
+        <CodePin
+        code="2018" // code.length is used if you not pass number prop
+        success={() => console.log('hurray!')} // If user fill '2018', success is called
+        text="A simple Pin code component" // My title
+        error="You fail" // If user fail (fill '2017' for instance)
+        autoFocusFirst={false} // disabling auto-focus
+        keyboardType="numeric"
+        />
+  
   }
+  
 }
 
 const styles = StyleSheet.create({
@@ -347,6 +389,14 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
     minHeight: DEVICE_HEIGHT,
     maxHeight: DEVICE_HEIGHT,
+  },
+  banner: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: BACKGROUND_COLOR,
   },
   noPermissionsText: {
     textAlign: 'center',
@@ -409,6 +459,28 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
     padding: 10,
   },
+  contract: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 70,
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    minHeight: DEVICE_HEIGHT / 2.0,
+    maxHeight: DEVICE_HEIGHT / 2.0
+  },
+  bottombutton: {
+    paddingTop: 270,
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    minHeight: DEVICE_HEIGHT / 2.0,
+    maxHeight: DEVICE_HEIGHT / 2.0
+  }
 });
 
 Expo.registerRootComponent(App);
