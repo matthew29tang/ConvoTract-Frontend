@@ -43,7 +43,7 @@ class App extends React.Component {
         } else {
             const currentView = this.state.currentView;
             if(currentView === Enums.Views.Main) {
-                return (<Views.Main></Views.Main>);
+                return (<Views.Main haveRecordingPermissions={this.state.haveRecordingPermissions}></Views.Main>);
             } else if(currentView === Enums.Views.Contract) {
                 return (<Views.Contract></Views.Contract>);
             } else if(currentView === Enums.Views.Pin) {

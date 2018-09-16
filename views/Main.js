@@ -2,10 +2,15 @@ import React from "react";
 import { Image, Text, TouchableHighlight, View } from "react-native";
 import { Styles } from "../util/Styles";
 import { Controls } from "../util/Controls";
+import { Toolbar, Button } from 'react-native-material-ui';
+import { Audio, FileSystem } from 'expo';
 
 class Main extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+
+        }
     } 
     
     _updateScreenForSoundStatus = status => {
@@ -54,10 +59,9 @@ class Main extends React.Component {
         this.setState({
             isLoading: true,
         });
-        if (this.sound !== null) {
-            await this.sound.unloadAsync();
-            this.sound.setOnPlaybackStatusUpdate(null);
-            this.sound = null;
+        if (this.state.sound) {
+            await this.state.sound.unloadAsync();
+            this.state.sound.setOnPlaybackStatusUpdate(null);
         }
         await Audio.setAudioModeAsync({
             allowsRecordingIOS: true,
@@ -66,17 +70,18 @@ class Main extends React.Component {
             shouldDuckAndroid: true,
             interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
         });
-        if (this.recording !== null) {
-            this.recording.setOnRecordingStatusUpdate(null);
-            this.recording = null;
+        if (this.state.recording) {
+            this.state.recording.setOnRecordingStatusUpdate(null);
         }
 
         const recording = new Audio.Recording();
         await recording.prepareToRecordAsync(this.recordingSettings);
         recording.setOnRecordingStatusUpdate(this._updateScreenForRecordingStatus);
 
-        this.recording = recording;
-        await this.recording.startAsync(); // Will call this._updateScreenForRecordingStatus to update the screen.
+        this.setState({
+            recording
+        })
+        await this.state.recording.startAsync(); // Will call this._updateScreenForRecordingStatus to update the screen.
         this.setState({
             isLoading: false,
         });
@@ -87,12 +92,12 @@ class Main extends React.Component {
             isLoading: true,
         });
         try {
-            await this.recording.stopAndUnloadAsync();
+            await this.state.recording.stopAndUnloadAsync();
         } catch (error) {
             // Do nothing -- we are already unloaded.
         }
-        const info = await FileSystem.getInfoAsync(this.recording.getURI());
-        console.log(this.recording.getURI());
+        const info = await FileSystem.getInfoAsync(this.state.recording.getURI());
+        console.log(this.state.recording.getURI());
         console.log(`FILE INFO: ${JSON.stringify(info)}`);
 
         {/* Send URI to processRecording
@@ -107,17 +112,16 @@ class Main extends React.Component {
             shouldDuckAndroid: true,
             interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
         });
-        const { sound, status } = await this.recording.createNewLoadedSound({
+        const { sound, status } = await this.state.recording.createNewLoadedSound({
             isLooping: true,
             isMuted: this.state.muted,
             volume: this.state.volume,
             rate: this.state.rate,
             shouldCorrectPitch: this.state.shouldCorrectPitch,
         }, this._updateScreenForSoundStatus);
-
-        this.sound = sound;
         this.setState({
             isLoading: false,
+            sound: sound
         });
     }
     
@@ -130,7 +134,7 @@ class Main extends React.Component {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    firstParam: this.recording.getURI()
+                    firstParam: this.state.recording.getURI()
                 }),
             });
             return response;
@@ -148,11 +152,11 @@ class Main extends React.Component {
     };
     
     _onPlayPausePressed = () => {
-        if (this.sound != null) {
+        if (this.state.sound != null) {
             if (this.state.isPlaying) {
-                this.sound.pauseAsync();
+                this.state.sound.pauseAsync();
             } else {
-                this.sound.playAsync();
+                this.state.sound.playAsync();
             }
         }
     };
@@ -164,8 +168,8 @@ class Main extends React.Component {
     }
 
     _onStopPressed = () => {
-        if (this.sound != null) {
-            this.sound.stopAsync();
+        if (this.state.sound != null) {
+            this.state.sound.stopAsync();
         }
     };
     
@@ -206,7 +210,7 @@ class Main extends React.Component {
             return (
                 <View style={ Styles.Banner }>
                     <Toolbar leftElement="" centerElement="ConvoTract" />
-                    <View style={ [Styles.HalfScreenContainer, { opacity: this.state.isLoading ? Controls.DISABLED_OPACITY : 1.0 }] }>
+                    <View style={ [Styles.HalfScreenContainer, { opacity: (this.state.isLoading ? Controls.DISABLED_OPACITY : 1.0) }] }>
                         <View />
                     
                         <View style={ Styles.RecordingContainer }>
