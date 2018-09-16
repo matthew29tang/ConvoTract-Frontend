@@ -23,7 +23,7 @@
   "dependencies": {
     "@shoutem/ui": "^0.23.4",
     "antd-mobile-rn": "^2.2.1",
-    "expo": "^27.0.1",
+    "expo": "^30.0.1",
     "react": "16.3.1",
     "react-native": "~0.55.2",
     "react-native-audio": "^4.1.3",
