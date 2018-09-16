@@ -6,6 +6,8 @@ import { Styles } from "./util/Styles";
 import { Views } from "./Views";
 import { API } from "./util/API";
 
+console.disableYellowBox = true;
+
 class App extends React.Component {
     constructor() {
         super();
@@ -55,13 +57,21 @@ class App extends React.Component {
         })
     }
 
+    _displayPin = () => {
+        this.setState({
+            currentView: Enums.Views.Pin
+        });
+        console.log("Changed view");
+    }
+	
+
     render() {
         if (!this.state.fontLoaded) {
             return (<View style={Styles.EmptyContainer} />);
         } else {
             const currentView = this.state.currentView;
             if (currentView === Enums.Views.Main) {
-                return (<Views.Main haveRecordingPermissions={this.state.haveRecordingPermissions} finishRecording={this._finishRecording}></Views.Main>);
+                return (<Views.Main haveRecordingPermissions={this.state.haveRecordingPermissions} finishRecording={this._finishRecording} viewChange={this._displayPin}></Views.Main>);
             } else if (currentView === Enums.Views.Contract) {
                 return (<Views.Contract pin={this.state.pin} key={this.state.key} user={this.state.user ? 2 : 1} contract={this.state.contract}></Views.Contract>);
             } else if (currentView === Enums.Views.Pin) {

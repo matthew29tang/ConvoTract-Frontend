@@ -1,18 +1,26 @@
 import axios from "axios";
 
-const ADDRESS = "localhost:8080/";
+const ADDRESS = "https://convotract.appspot.com/";
 
-const ajax = (url, data, callback) => {
-    axios.post(ADDRESS + url, data).then(result => {
-        callback(result.data);
+const ajax = (url, data, callback = null, contentType = null) => {
+    const args = contentType === null ? [ADDRESS + url, data] : [ADDRESS + url, data , {header: {"Content-Type": contentType}}];
+    return axios.post(...args).then(result => {
+        if(callback !== null) callback(result.data);
     });
+    
 }
 
 const API = {
     processRecording: (url, callback) => {
-        ajax("processRecording", {
-            url: url
+        const body = new FormData();
+        body.append("picture", {
+            uri: url,
+            name: "recording"
         });
+        return ajax("processRecording", {
+            file: body
+        }, null, "multipart/form-data");
+        
     },
     generatePin: (key, callback) => {
         ajax("generatePin", {

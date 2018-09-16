@@ -168,9 +168,8 @@ class Main extends React.Component {
     };
     
     _displayPin = () => {
-        this.setState({
-            display: 'pin',
-        });
+        console.log(this.props);
+        this.props.viewChange();
     }
 
     _onStopPressed = () => {
