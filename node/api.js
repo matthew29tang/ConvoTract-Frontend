@@ -1,7 +1,9 @@
 const contracts = require("./contracts");
+const request = require("request");
 
 const processRecording = (req, res) => {
-    // handle recording
+    request.post("https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US")
+
     const contract = "hi";
     const key = contracts.push({
         contract: contract
